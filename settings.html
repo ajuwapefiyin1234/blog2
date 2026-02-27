@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--primary:#3e7ad8;
+--primary-dark:#2f63b1;
+--danger:#e74c3c;
+--danger-dark:#c0392b;
+--border:#dfe3ea;
+--text:#1f2a37;
+--muted:#6b7280;
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+font-family:Poppins,sans-serif;
+background:url(images/tumblr_inline_mlky878ojb1r53miq.png);
+padding:20px;
+color:var(--text);
+}
+
+.container{
+max-width:640px;
+margin:auto;
+background:white;
+padding:28px;
+border-radius:14px;
+box-shadow:0 8px 24px rgba(0,0,0,0.12);
+}
+
+.nav{
+margin-bottom:22px;
+}
+
+.nav a{
+margin-right:15px;
+text-decoration:none;
+font-weight:600;
+color:var(--primary);
+}
+
+h2{
+margin:0 0 16px;
+text-align:center;
+}
+
+.profilePreview{
+text-align:center;
+margin-bottom:20px;
+padding-bottom:16px;
+border-bottom:1px solid #edf0f5;
+}
+
+.fieldGroup{
+margin-bottom:14px;
+}
+
+.fieldLabel{
+display:block;
+font-size:13px;
+font-weight:600;
+color:var(--muted);
+margin-bottom:6px;
+text-transform:uppercase;
+letter-spacing:0.03em;
+}
+
+input{
+width:100%;
+padding:11px 12px;
+border-radius:8px;
+border:1px solid var(--border);
+font-family:inherit;
+font-size:14px;
+}
+
+input:focus{
+outline:none;
+border-color:var(--primary);
+box-shadow:0 0 0 3px rgba(62,122,216,0.14);
+}
+
+.fileInput{
+display:none;
+}
+
+.fileLabel{
+display:flex;
+align-items:center;
+gap:10px;
+width:100%;
+padding:11px 12px;
+border:1px dashed #b8c2d3;
+border-radius:8px;
+background:#f7faff;
+cursor:pointer;
+font-size:14px;
+color:#27436e;
+}
+
+.fileLabel:hover{
+background:#eef5ff;
+}
+
+.fileIcon{
+width:18px;
+height:18px;
+flex-shrink:0;
+}
+
+.fileName{
+margin-top:7px;
+font-size:12px;
+color:var(--muted);
+}
+
+button{
+padding:10px 15px;
+background:var(--primary);
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-right:8px;
+font-family:inherit;
+font-weight:600;
+}
+
+button:hover{
+background:var(--primary-dark);
+}
+
+.deleteBtn{
+background:var(--danger);
+}
+
+.deleteBtn:hover{
+background:var(--danger-dark);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="nav">
+<a href="index.html">Home</a>
+</div>
+
+<h2>Settings</h2>
+
+<div class="profilePreview" id="profilePreview"></div>
+
+<div class="fieldGroup">
+<label class="fieldLabel" for="name">Change Username</label>
+<input type="text" id="name" placeholder="Enter new username">
+</div>
+
+<div class="fieldGroup">
+<label class="fieldLabel" for="email">Change Email</label>
+<input type="email" id="email" placeholder="Enter new email">
+</div>
+
+<div class="fieldGroup">
+<label class="fieldLabel" for="newPassword">Change Password</label>
+<input type="password" id="newPassword" placeholder="Enter new password">
+</div>
+
+<div class="fieldGroup">
+<label class="fieldLabel" for="imageInput">Change Profile Image</label>
+<label class="fileLabel" for="imageInput">
+<svg class="fileIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+<path d="M9 4h6l1.2 2H20a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2h3.8L9 4z" stroke="currentColor" stroke-width="1.6"/>
+<circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/>
+</svg>
+<span>Choose Image</span>
+</label>
+<input class="fileInput" type="file" id="imageInput" accept="image/*">
+<div class="fileName" id="imageFileName">No file selected</div>
+</div>
+
+<button onclick="saveSettings()">Save Changes</button>
+<button class="deleteBtn" onclick="deleteAccount()">Delete Account</button>
+
+</div>
+
+<script>
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+if(!currentUser){
+window.location = "login.html";
+}
+
+document.getElementById("profilePreview").innerHTML = `
+<img src="${currentUser.image}" style="
+width:80px;
+height:80px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+">
+<h3>${currentUser.name}</h3>
+<p style="color:gray">${currentUser.email}</p>
+<p>Posts: ${posts.filter(p => p.author === currentUser.name).length}</p>
+`;
+
+document.getElementById("name").value = currentUser.name;
+document.getElementById("email").value = currentUser.email;
+
+document.getElementById("imageInput").addEventListener("change", function(){
+let fileName = this.files[0] ? this.files[0].name : "No file selected";
+document.getElementById("imageFileName").textContent = fileName;
+});
+
+function saveSettings(){
+let newName = document.getElementById("name").value;
+let newEmail = document.getElementById("email").value;
+let newPassword = document.getElementById("newPassword").value;
+let imageFile = document.getElementById("imageInput").files[0];
+
+if(imageFile){
+let reader = new FileReader();
+reader.onload = function(e){
+updateUser(newName, newEmail, newPassword, e.target.result);
+};
+reader.readAsDataURL(imageFile);
+}else{
+updateUser(newName, newEmail, newPassword, currentUser.image);
+}
+}
+
+function updateUser(name, email, password, image){
+let userIndex = users.findIndex(u => u.email === currentUser.email);
+
+if(userIndex === -1){
+alert("User not found");
+return;
+}
+
+users[userIndex].name = name;
+users[userIndex].email = email;
+
+if(password !== ""){
+users[userIndex].password = password;
+}
+
+users[userIndex].image = image;
+
+localStorage.setItem("users", JSON.stringify(users));
+
+currentUser = users[userIndex];
+localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+alert("Profile updated!");
+window.location = "index.html";
+}
+
+function deleteAccount(){
+if(confirm("Are you sure you want to delete your account?")){
+users = users.filter(u => u.email !== currentUser.email);
+posts = posts.filter(p => p.author !== currentUser.name);
+
+localStorage.setItem("users", JSON.stringify(users));
+localStorage.setItem("posts", JSON.stringify(posts));
+localStorage.removeItem("currentUser");
+
+window.location = "signup.html";
+}
+}
+</script>
+
+</body>
+</html>
