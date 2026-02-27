@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<style>
+
+body{
+    font-family:Poppins,sans-serif;
+    background:url(images/tumblr_inline_mlky878ojb1r53miq.png) no-repeat center center fixed;
+    background-size:cover;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    width:320px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:12px;
+    box-sizing:border-box;
+    border-radius:6px;
+    border:1px solid #ddd;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#4a90e2;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2 style="text-align:center">Login</h2>
+
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p style="text-align:center;font-size:14px">
+Don't have account? <a href="signup.html">Signup</a>
+</p>
+
+</div>
+
+<script>
+
+/* ⭐ Auto-fill saved signup info */
+
+window.onload = function(){
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+if(users.length > 0){
+
+let lastUser = users[users.length - 1];
+
+document.getElementById("email").value = lastUser.email;
+document.getElementById("password").value = lastUser.password;
+
+}
+
+};
+
+function login(){
+
+let email = document.getElementById("email").value;
+let password = document.getElementById("password").value;
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+let user = users.find(u =>
+u.email === email && u.password === password
+);
+
+if(user){
+
+localStorage.setItem("currentUser",JSON.stringify(user));
+
+alert("Login successful");
+
+window.location="index.html";
+
+}
+else{
+alert("Account not found or wrong password");
+}
+
+}
+
+</script>
+
+</body>
+</html>
