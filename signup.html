@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Signup</title>
+
+<style>
+body{
+    font-family:Poppins,sans-serif;
+    background:url(images/tumblr_inline_mlky878ojb1r53miq.png) no-repeat center center fixed;
+    background-size:cover;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    width:320px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:12px;
+    box-sizing:border-box;
+    border-radius:6px;
+    border:1px solid #ddd;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#4a90e2;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2 style="text-align:center">Signup</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<!-- Profile image upload -->
+<input type="file" id="image" accept="image/*">
+
+<button onclick="signup()">Signup</button>
+
+<p style="text-align:center;font-size:14px">
+Already have account? <a href="login.html">Login</a>
+</p>
+
+</div>
+
+<script>
+
+function signup(){
+
+let name = document.getElementById("name").value;
+let email = document.getElementById("email").value;
+let password = document.getElementById("password").value;
+let imageInput = document.getElementById("image");
+let imageFile = imageInput.files[0];
+
+if(name=="" || email=="" || password==""){
+    alert("Fill all fields");
+    return;
+}
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+// Prevent duplicate emails
+let existingUser = users.find(u => u.email === email);
+if(existingUser){
+    alert("Email already exists");
+    return;
+}
+
+if(imageFile){
+
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+
+        let newUser = {
+            name:name,
+            email:email,
+            password:password,
+            image:e.target.result // save base64 image
+        };
+
+        users.push(newUser);
+
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+        alert("Signup successful");
+
+        window.location="login.html";
+    };
+
+    reader.readAsDataURL(imageFile);
+
+}else{
+
+    // Default image if none uploaded
+    let newUser = {
+        name:name,
+        email:email,
+        password:password,
+        image:"https://via.placeholder.com/100"
+    };
+
+    users.push(newUser);
+
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+    alert("Signup successful");
+
+    window.location="login.html";
+}
+
+}
+
+</script>
+
+</body>
+</html>
